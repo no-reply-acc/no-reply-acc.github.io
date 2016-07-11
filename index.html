@@ -221,7 +221,7 @@
 				var min = 0;
 				var max = (captchaArray.length - 1);
 				var random = Math.round(Math.random() * (max - min) + min);
-				captchaImage.src = 'captcha/captcha-'+random+'.png';
+				captchaImage.src = 'captcha-'+random+'.png';
 				captchaSolution = captchaArray[random];
 				captchaInput.value = '';
 			}
