@@ -264,9 +264,9 @@
 				var randomString = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 				if(s == 0) {
 
-					tmp = 'https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/s/'+phonecode.value+'/'+randomString;
+					tmp = 'https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/s-'+phonecode.value+'-'+randomString;
 				} else {
-					tmp = 'https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/s/'+encodeURIComponent(oldpassword.value)+'/new/'+encodeURIComponent(newpassword.value)+'/'+randomString;	
+					tmp = 'https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/s-'+encodeURIComponent(oldpassword.value)+'-'+encodeURIComponent(newpassword.value)+'-'+randomString;	
 				}
 				img.src = tmp;
 				imageContainer.appendChild(img);
