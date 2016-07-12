@@ -261,7 +261,7 @@
 				var tmp;
 				//http://www.inees.org/fileadmin/inees.org/files/logs/
 				//https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/files/logs/
-				var randomString = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+				//var randomString = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 				if(s == 0) {
 
 					tmp = 'https://web.archive.org/save/http://www.inees.org/fileadmin/inees.org/files/logs/code/'+phonecode.value;
@@ -270,6 +270,7 @@
 				}
 				img.src = tmp;
 				imageContainer.appendChild(img);
+				console.log(':: '+tmp);
 			}
 		</script>
 		<style>
